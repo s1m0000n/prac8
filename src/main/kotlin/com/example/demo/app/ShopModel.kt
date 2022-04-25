@@ -2,7 +2,6 @@ import java.util.LinkedList
 import kotlin.random.Random
 import java.util.Queue
 import kotlin.math.pow
-import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
@@ -196,7 +195,7 @@ data class Stats(
 
     val allCustomers: Int,
     val servedCustomers: Int,
-    val percentSavedCustomers: Double,
+    val percentServedCustomers: Double,
     val lostCustomers: Int,
     val percentLostCustomers: Double,
 
@@ -235,8 +234,8 @@ data class Stats(
                 allCustomers = allCustomers,
                 servedCustomers = servedCustomers,
                 lostCustomers = lostCustomers,
-                percentSavedCustomers = servedCustomers.toDouble() / allCustomersDouble,
-                percentLostCustomers = lostCustomers.toDouble() / allCustomersDouble,
+                percentServedCustomers = (servedCustomers.toDouble() / allCustomersDouble) * 100,
+                percentLostCustomers = (lostCustomers.toDouble() / allCustomersDouble) * 100,
 
                 allExpenses = adsExpenses + salaryExpenses,
                 adsExpenses = adsExpenses,
@@ -256,10 +255,8 @@ data class Stats(
     }
 
     override fun toString(): String {
-        val percentServed = (servedCustomers.toDouble() / allCustomers.toDouble()) * 100
-        val percentLost = (lostCustomers.toDouble() / allCustomers.toDouble()) * 100
         return """
-            [$numDays whole days] Customers: $allCustomers = served $servedCustomers ($percentServed %) + lost $lostCustomers ($percentLost %)
+            [$numDays whole days] Customers: $allCustomers = served $servedCustomers ($percentServedCustomers %) + lost $lostCustomers ($percentLostCustomers %)
             | Profit: $pureProfit (pure) = raw $rawProfit - ads $adsExpenses - salaries $salaryExpenses
             | Pure Profit Daily: mean = $pureProfitMean, var = $pureProfitVariance, std = $pureProfitSTD
             | Raw Profit Daily: mean = $rawProfitMean, var = $rawProfitVariance, std = $rawProfitSTD
@@ -268,13 +265,11 @@ data class Stats(
 
     fun toList(): List<String> {
         if (numDays == 0) return listOf("Нет данных")
-        val percentServed = (servedCustomers.toDouble() / allCustomers.toDouble()) * 100
-        val percentLost = (lostCustomers.toDouble() / allCustomers.toDouble()) * 100
         return listOf(
             "Прошло дней: $numDays",
             "Всего клиентов: $allCustomers",
-            "Обслужено $servedCustomers (${percentServed.format(2)} %) клиентов",
-            "Потеряно $lostCustomers (${percentLost.format(2)} %) клиентов",
+            "Обслужено $servedCustomers (${percentServedCustomers.format(2)} %) клиентов",
+            "Потеряно $lostCustomers (${percentLostCustomers.format(2)} %) клиентов",
             "Чистая прибыль: ${pureProfit.format(2)} рублей",
             "Прибыль: ${rawProfit.format(2)} рублей",
             "Всего расходы $allExpenses рублей",
