@@ -42,13 +42,13 @@ class CustomersQueue(
         waitingTime = timeRangeWaiting.next(),
         timeAtCD = timeRangeAtCD.next()
     ))
-    fun step(time: Int, additionalCustomersPart: Double) {
+    fun step(time: Int) {
         customers = customers.map { it.waitStep(time) }
         while (customers.size > 0 && customers.peek().isLeaving()) {
             customers.poll()
             lostCount += 1
         }
-        var time = (time.toDouble() * (additionalCustomersPart + 1)).roundToInt()
+
         var added = 0
         if (time <= timeRangeBetweenCustomers.max) {
             timeUntilNewCustomer -= time
@@ -313,7 +313,6 @@ class Model(
         timeUntilDayEnd -= time
         if (timeUntilDayEnd <= 0) {
             timeUntilDayEnd = 1440
-            additionalCustomersPart = params.adsDailyExpenses7K.toDouble() / 10
             daysSinceStart += 1
             dailyStats.add(DailyStats(
                 servedCustomers = cashDesks.servedCount,
@@ -327,6 +326,6 @@ class Model(
             cashDesks.resetStats()
             queue.resetStats()
         }
-        queue.step(time, additionalCustomersPart)
+        queue.step(time)
     }
 }
