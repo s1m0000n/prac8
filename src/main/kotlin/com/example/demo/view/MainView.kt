@@ -1,50 +1,10 @@
 package com.example.demo.view
 
-import IntSampler
-import Model
-import Params
+import com.example.demo.app.IntSampler
+import com.example.demo.app.MainController
 import com.example.demo.app.Styles
-import javafx.beans.property.SimpleStringProperty
-import javafx.collections.FXCollections
 import javafx.scene.control.TextField
 import tornadofx.*
-
-class MainController: Controller() {
-    val stats = FXCollections.observableArrayList("Нет данных")
-    val stats_daily = FXCollections.observableArrayList("Нет данных")
-    var model = Model(
-        Params(
-            timeRangeBetweenCustomers = IntSampler(1, 5),
-            timeRangeAtCD = IntSampler(10, 20)
-        ))
-    val queueSize = SimpleStringProperty("")
-    val queueViz = SimpleStringProperty("")
-    val cashDesksViz = FXCollections.observableArrayList("Нет данных")
-
-    fun step(time: Int) {
-        model.step(time)
-        stats.clear()
-        stats.addAll(model.stats.toList())
-
-        if (model.dailyStats.isNotEmpty()) {
-            stats_daily.clear()
-            stats_daily.addAll(model.dailyStats.last().toList())
-        }
-        queueSize.set(" (" + model.queue.size.toString() + " клиентов)")
-        var queueVizAcc = ""
-        for (i in 0 until model.queue.size) {
-            queueVizAcc += "△ "
-        }
-        queueViz.set(queueVizAcc)
-        cashDesksViz.clear()
-        cashDesksViz.addAll(model.cashDesks.listViz)
-    }
-    fun updateParams(params_fun: Params.() -> Unit) {
-        val newParams = model.params.copy()
-        params_fun(newParams)
-        model = Model(newParams)
-    }
-}
 
 class MainView : View("Моделирование работы супермаркета") {
     private val intFieldErrorMessage = "Значение поля должно быть целым числом"
@@ -277,7 +237,7 @@ class MainView : View("Моделирование работы супермар�
                         addClass(Styles.heading)
                         style { fontSize = 12.pt }
                     }
-                    listview(controller.stats_daily) {style { minWidth = 400.px }}
+                    listview(controller.statsDaily) {style { minWidth = 400.px }}
                 }
             }
             // Awaiting customers queue
